@@ -108,7 +108,7 @@ This combined loss is critical for knowledge distillation, balancing supervised 
 - **Formula**: ![Formula :](ce.png)
   - ( C ): Number of classes (14, as defined in `data_label1.json`).
   - ( y_i ): True label for class ( i ), where ( y_i = 1 ) if ( i ) is the correct class, and ( y_i = 0 ) otherwise (one-hot encoding).
-  - ( \hat{y}_i ): Predicted probability for class ( i ), computed from the student’s logits using softmax: $ \hat{y}_i = \frac{\exp(\text{logit}i)}{\sum{j=1}^{C} \exp(\text{logit}_j)} $
+  - ( \hat{y}_i ): Predicted probability for class ( i ), computed from the student’s logits using softmax: ![sm](sm.png)
 - **Implementation**: In `model.py`, `nn.CrossEntropyLoss` computes CE Loss by comparing `student_logits` (model outputs) with `labels` (`batch["hard_labels"]`).
 - **Role**: Encourages the student to assign high probability to the correct class. For example, for a sample with `label_id=0` (`"ordering"`), CE Loss penalizes low (\hat{y}\_0). This is essential for maintaining accuracy on the test set (`testfile1.csv`).
 
