@@ -115,10 +115,10 @@ This combined loss is critical for knowledge distillation, balancing supervised 
 #### **Kullback-Leibler Divergence Loss (**`kl_loss`**)**
 
 - **Purpose**: Measures how well the student’s output probability distribution matches the teacher’s soft labels (`soft_labels` in `trainfile1.csv`, e.g., `[0.8, 0.05, 0.03, ...]`). It transfers the teacher’s nuanced knowledge, including inter-class relationships (e.g., slight similarity between `"ordering"` and `"show_menu"`).
-- **Formula**: $ \text{KL} = \sum_{i=1}^{C} p_i \log\left(\frac{p_i}{q_i}\right) $
+- **Formula**: ![fmKL](kl.png)
   - ( p_i ): Teacher’s soft label probability for class ( i ).
-  - ( q_i ): Student’s predicted probability for class ( i ), softened using a temperature ( T = 2.0 ): $ q_i = \frac{\exp(\text{logit}i / T)}{\sum{j=1}^{C} \exp(\text{logit}_j / T)} $
-  - The student’s log-probabilities are computed as: $ \text{student_log_probs} = \text{LogSoftmax}\left(\frac{\text{student_logits}}{T}\right) $
+  - ( q_i ): Student’s predicted probability for class ( i ), softened using a temperature ( T = 2.0 ): ![spn](spn.png)
+  - The student’s log-probabilities are computed as: ![student_log](student_log.png) 
 - **Implementation**: In `model.py`, `nn.KLDivLoss` (with `reduction='batchmean'`) computes KL Loss between `student_log_probs` and `soft_labels`. The temperature ( T = 2.0 ) softens the student’s distribution to emphasize inter-class relationships.
 - **Role**: Encourages the student to mimic the teacher’s distribution, improving generalization. For example, a soft label `[0.8, 0.05, 0.03, ...]` for `"ordering"` indicates secondary relevance to `"shipping"`, which KL Loss helps the student learn.
 
