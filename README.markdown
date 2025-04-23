@@ -105,20 +105,20 @@ This combined loss is critical for knowledge distillation, balancing supervised 
 #### **Cross-Entropy Loss (**`ce_loss`**)**
 
 - **Purpose**: Measures the difference between the student model’s predicted probabilities and the ground-truth hard labels (`label_id` in `trainfile1.csv`, e.g., `0` for `"ordering"`). It ensures the student correctly predicts the true class.
-- **Formula**: \[ \\text{CE} = -\\sum\_{i=1}^C y_i \\log(\\hat{y}\_i) \]
+- **Formula**: $$ \\text{CE} = -\\sum\_{i=1}^C y_i \\log(\\hat{y}\_i) $$
   - ( C ): Number of classes (14, as defined in `data_label1.json`).
   - ( y_i ): True label for class ( i ), where ( y_i = 1 ) if ( i ) is the correct class, and ( y_i = 0 ) otherwise (one-hot encoding).
-  - ( \\hat{y}\_i ): Predicted probability for class ( i ), computed from the student’s logits using softmax: \[ \\hat{y}\_i = \\frac{\\exp(\\text{logit}*i)}{\\sum*{j=1}^C \\exp(\\text{logit}\_j)} \]
+  - ( \\hat{y}\_i ): Predicted probability for class ( i ), computed from the student’s logits using softmax: $$ \\hat{y}\_i = \\frac{\\exp(\\text{logit}*i)}{\\sum*{j=1}^C \\exp(\\text{logit}\_j)} $$
 - **Implementation**: In `model.py`, `nn.CrossEntropyLoss` computes CE Loss by comparing `student_logits` (model outputs) with `labels` (`batch["hard_labels"]`).
 - **Role**: Encourages the student to assign high probability to the correct class. For example, for a sample with `label_id=0` (`"ordering"`), CE Loss penalizes low (\\hat{y}\_0). This is essential for maintaining accuracy on the test set (`testfile1.csv`).
 
 #### **Kullback-Leibler Divergence Loss (**`kl_loss`**)**
 
 - **Purpose**: Measures how well the student’s output probability distribution matches the teacher’s soft labels (`soft_labels` in `trainfile1.csv`, e.g., `[0.8, 0.05, 0.03, ...]`). It transfers the teacher’s nuanced knowledge, including inter-class relationships (e.g., slight similarity between `"ordering"` and `"show_menu"`).
-- **Formula**: \[ \\text{KL} = \\sum\_{i=1}^C p_i \\log\\left(\\frac{p_i}{q_i}\\right) \]
+- **Formula**: $$ \\text{KL} = \\sum\_{i=1}^C p_i \\log\\left(\\frac{p_i}{q_i}\\right) $$
   - ( p_i ): Teacher’s soft label probability for class ( i ).
-  - ( q_i ): Student’s predicted probability for class ( i ), softened using a temperature ( T = 2.0 ): \[ q_i = \\frac{\\exp(\\text{logit}*i / T)}{\\sum*{j=1}^C \\exp(\\text{logit}\_j / T)} \]
-  - The student’s log-probabilities are computed as: \[ \\text{student_log_probs} = \\text{LogSoftmax}\\left(\\frac{\\text{student_logits}}{T}\\right) \]
+  - ( q_i ): Student’s predicted probability for class ( i ), softened using a temperature ( T = 2.0 ): $$ q_i = \\frac{\\exp(\\text{logit}*i / T)}{\\sum*{j=1}^C \\exp(\\text{logit}\_j / T)} $$
+  - The student’s log-probabilities are computed as: $$ \\text{student_log_probs} = \\text{LogSoftmax}\\left(\\frac{\\text{student_logits}}{T}\\right) $$
 - **Implementation**: In `model.py`, `nn.KLDivLoss` (with `reduction='batchmean'`) computes KL Loss between `student_log_probs` and `soft_labels`. The temperature ( T = 2.0 ) softens the student’s distribution to emphasize inter-class relationships.
 - **Role**: Encourages the student to mimic the teacher’s distribution, improving generalization. For example, a soft label `[0.8, 0.05, 0.03, ...]` for `"ordering"` indicates secondary relevance to `"shipping"`, which KL Loss helps the student learn.
 
