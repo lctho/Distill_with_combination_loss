@@ -105,7 +105,7 @@ This combined loss is critical for knowledge distillation, balancing supervised 
 #### **Cross-Entropy Loss (**`ce_loss`**)**
 
 - **Purpose**: Measures the difference between the student model’s predicted probabilities and the ground-truth hard labels (`label_id` in `trainfile1.csv`, e.g., `0` for `"ordering"`). It ensures the student correctly predicts the true class.
-- ![**Formula**]:(https://drive.google.com/drive/u/0/folders/1nwXvRYhSWyljgF6cle12JjPN_fjgusaa) $ \text{CE} = -\sum_{i=1}^{C} y_i \log(\hat{y}_i) $
+- ![**Formula**]:(ce.png)
   - ( C ): Number of classes (14, as defined in `data_label1.json`).
   - ( y_i ): True label for class ( i ), where ( y_i = 1 ) if ( i ) is the correct class, and ( y_i = 0 ) otherwise (one-hot encoding).
   - ( \hat{y}_i ): Predicted probability for class ( i ), computed from the student’s logits using softmax: $ \hat{y}_i = \frac{\exp(\text{logit}i)}{\sum{j=1}^{C} \exp(\text{logit}_j)} $
